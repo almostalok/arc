@@ -2,8 +2,17 @@
 
 import React from 'react';
 import { AppShell } from '../../../components/layout/AppShell';
+import { StatRow } from '../../../components/ui/StatRow';
+import { Badge } from '../../../components/ui/Badge';
 import { mockStudents } from '../../../data/mockData';
-import { CalendarCheck, AlertTriangle, CheckCircle2, ShieldCheck, Calendar, Info } from 'lucide-react';
+import { 
+  CalendarCheck, 
+  AlertTriangle, 
+  ShieldCheck, 
+  CheckCircle2, 
+  Info,
+  Calendar
+} from 'lucide-react';
 
 export default function StudentAttendancePage() {
   const student = mockStudents[0];
@@ -11,149 +20,141 @@ export default function StudentAttendancePage() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-        <div>
+        <div className="border-b border-slate-200/80 pb-5">
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Attendance Operating Matrix • Mandatory 75% Regulatory Threshold
+            Attendance Operating Matrix • Statutory 75% Regulatory Threshold
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-            Attendance Records & Eligibility Audits
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+            Attendance Records & Regulatory Eligibility
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Real-time biometric and classroom attendance synced from faculty lectures.
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            Lecture-by-lecture biometric verification synced from faculty attendance registers.
           </p>
         </div>
 
-        {/* Warning Banner if any subject < 80% */}
-        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 flex items-start space-x-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-xs">
+        {/* High-Signal Stat Row (Rule 12) */}
+        <StatRow
+          stats={[
+            {
+              label: 'Overall Aggregate Attendance',
+              value: `${student.attendancePercentage}%`,
+              change: '+1.2%',
+              trend: 'up',
+              meta: '220 sessions attended of 252 conducted',
+              badge: 'Safe Status',
+            },
+            {
+              label: 'Statutory 75% Margin',
+              value: '+31 Classes',
+              meta: 'Cushion above mandatory threshold',
+              badge: 'Regulatory Compliant',
+            },
+            {
+              label: 'Courses in Warning Zone',
+              value: '1 Course',
+              change: 'CS605 at 79.2%',
+              trend: 'down',
+              meta: 'Requires attention',
+              badge: 'At Caution',
+            },
+            {
+              label: 'Examination Eligibility',
+              value: '100% Cleared',
+              meta: 'Approved for End-Semester Examinations',
+              badge: 'Certified',
+            },
+          ]}
+        />
+
+        {/* Warning Banner if any subject approaches threshold */}
+        <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200/80 flex items-start space-x-3 text-xs">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
             <span className="font-bold text-amber-950">
-              Threshold Warning: Artificial Intelligence (CS605) is approaching 75% cutoff
+              Regulatory Margin Notice: Artificial Intelligence (CS605) is approaching the 75% cutoff
             </span>
-            <p className="text-amber-800 mt-0.5 leading-relaxed">
-              Your attendance in CS605 stands at 79.2% (38/48 sessions). Missing 3 more classes will drop you below the university exam eligibility requirement.
+            <p className="text-amber-800 leading-relaxed">
+              Your CS605 attendance is currently <strong>79.2%</strong> (38/48 sessions). Missing 3 more classes without medical documentation will trigger automated exam debarment.
             </p>
           </div>
         </div>
 
-        {/* Top Overall Attendance Banner */}
-        <div className="p-6 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
-          <div className="space-y-1">
-            <span className="text-[11px] uppercase font-bold tracking-wider text-slate-400">
-              Aggregate Institutional Attendance
-            </span>
-            <div className="text-4xl font-black font-mono text-emerald-400">
-              {student.attendancePercentage}%
+        {/* Subject-Wise Attendance Distribution Table (Rule 39) */}
+        <div className="rounded-xl bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                Course Attendance Register & Threshold Audits
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Calculated in real-time according to AICTE statutory mandates.
+              </p>
             </div>
-            <p className="text-xs text-slate-300">
-              220 sessions attended out of 252 held across all 6 courses
-            </p>
+            <span className="text-xs font-mono text-slate-500">Odd Semester 2026</span>
           </div>
 
-          <div className="flex items-center space-x-3 bg-slate-800/80 p-3 rounded-xl border border-slate-700">
-            <ShieldCheck className="w-6 h-6 text-emerald-400" />
-            <div className="text-xs">
-              <div className="font-bold text-white">Full Exam Clearance</div>
-              <div className="text-[11px] text-emerald-300 font-mono">Eligible for End-Sem Practicals</div>
-            </div>
-          </div>
-        </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Course Code</th>
+                  <th className="px-4 py-3">Subject Name</th>
+                  <th className="px-3 py-3">Faculty In-Charge</th>
+                  <th className="px-3 py-3">Attended / Total</th>
+                  <th className="px-4 py-3">Attendance %</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Margin Cushion</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {student.attendanceBySubject.map((sub) => {
+                  const isSafe = sub.percentage >= 85;
+                  const isWarning = sub.percentage >= 75 && sub.percentage < 85;
 
-        {/* Subject-Wise Attendance Breakdown */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900">Subject-wise Attendance Distribution</h3>
-            <span className="text-xs text-slate-400 font-mono">Odd Semester 2024–25</span>
-          </div>
-
-          <div className="space-y-4">
-            {student.attendanceBySubject.map((sub) => {
-              const isWarning = sub.percentage < 80;
-
-              return (
-                <div key={sub.subjectCode} className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/40 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
-                          {sub.subjectCode}
-                        </span>
-                        <h4 className="text-xs font-bold text-slate-900">{sub.subjectName}</h4>
-                      </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">Faculty: {sub.faculty}</div>
-                    </div>
-
-                    <div className="flex items-center space-x-3 self-start sm:self-auto">
-                      <span className="text-xs text-slate-500 font-mono">
-                        {sub.attended} / {sub.total} Classes
-                      </span>
-                      <span className={`text-sm font-extrabold font-mono px-2 py-0.5 rounded border ${
-                        isWarning 
-                          ? 'bg-amber-50 text-amber-700 border-amber-200' 
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      }`}>
-                        {sub.percentage}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        isWarning ? 'bg-amber-500' : 'bg-emerald-500'
-                      }`}
-                      style={{ width: `${sub.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 30-Day Attendance Calendar Grid Mockup */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-sm font-bold text-slate-900">Attendance Log — Recent Lecture Days</h3>
-            </div>
-            <div className="flex items-center space-x-3 text-[11px]">
-              <span className="flex items-center space-x-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-                <span className="text-slate-600">Present (Full Day)</span>
-              </span>
-              <span className="flex items-center space-x-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
-                <span className="text-slate-600">Absent / Leave</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-15 gap-1.5 pt-2">
-            {Array.from({ length: 30 }).map((_, idx) => {
-              const day = idx + 1;
-              const isAbsent = day === 6 || day === 19 || day === 24;
-              const isWeekend = day % 7 === 0 || day % 7 === 6;
-
-              return (
-                <div
-                  key={idx}
-                  className={`p-2 rounded-lg border text-center text-[10px] font-mono transition-colors ${
-                    isWeekend
-                      ? 'bg-slate-100 text-slate-400 border-slate-200'
-                      : isAbsent
-                      ? 'bg-rose-50 text-rose-700 border-rose-200 font-bold'
-                      : 'bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold'
-                  }`}
-                  title={isWeekend ? `Day ${day}: Holiday / Weekend` : isAbsent ? `Day ${day}: Absent` : `Day ${day}: Present`}
-                >
-                  <div>D{day}</div>
-                  <div className="text-[9px] mt-0.5">{isWeekend ? 'OFF' : isAbsent ? 'ABS' : 'PRE'}</div>
-                </div>
-              );
-            })}
+                  return (
+                    <tr key={sub.subjectCode} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="px-4 py-3 font-mono font-semibold text-slate-900">
+                        {sub.subjectCode}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-slate-900">
+                        {sub.subjectName}
+                      </td>
+                      <td className="px-3 py-3 text-slate-600">
+                        {sub.faculty}
+                      </td>
+                      <td className="px-3 py-3 font-mono tabular-nums text-slate-600">
+                        {sub.attended} / {sub.total}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-bold tabular-nums text-slate-900">
+                        <div className="flex items-center space-x-2">
+                          <span>{sub.percentage}%</span>
+                          <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                isSafe ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'
+                              }`}
+                              style={{ width: `${sub.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant={isSafe ? 'success' : isWarning ? 'warning' : 'danger'}
+                          size="sm"
+                          dot
+                        >
+                          {sub.status}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-[11px] text-slate-500">
+                        {isWarning ? 'Can miss max 2 classes' : 'Safe margin (+5 classes)'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
