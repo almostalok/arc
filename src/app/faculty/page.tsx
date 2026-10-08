@@ -3,18 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { AppShell } from '../../components/layout/AppShell';
-import { MetricCard } from '../../components/ui/MetricCard';
+import { StatRow } from '../../components/ui/StatRow';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 import { 
   Users, 
   CalendarCheck, 
   BookOpen, 
-  Upload, 
-  Bell, 
+  Clock, 
   CheckCircle2, 
+  AlertTriangle,
+  FileCheck,
   ArrowRight,
-  Plus,
-  Clock,
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
 
 export default function FacultyDashboardPage() {
@@ -27,206 +28,192 @@ export default function FacultyDashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-5">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">
-                Faculty Academic Workbench
+              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+                Faculty Instruction Workbench
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-semibold border border-purple-200">
-                Prof. Shalini Mishra
+              <span className="text-[11px] font-medium text-slate-500">
+                • Prof. Shalini Mishra (Associate Professor, CSE)
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Teaching Overview & Course Workbench
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+              Teaching Overview & Course Actions
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Class attendance marking, internal assessment grading, and lecture notes publishing.
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Lecture attendance marking, continuous evaluation grading, and student threshold alerts.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button
+          <div className="flex items-center space-x-2.5">
+            <Button
+              variant={markedToday ? 'outline' : 'secondary'}
+              size="sm"
+              leftIcon={<CalendarCheck className="w-3.5 h-3.5" />}
               onClick={() => {
                 setMarkedToday(true);
-                alert('Attendance marked for Operating Systems (CSE 6B) — 58/61 present (95%). Synced to ARC Node.');
               }}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center space-x-1.5 transition-all shadow-xs"
             >
-              <CalendarCheck className="w-3.5 h-3.5" />
-              <span>{markedToday ? 'Attendance Synced ✓' : 'Quick Mark Attendance'}</span>
-            </button>
+              {markedToday ? 'Attendance Synced ✓' : 'Mark Next Lecture Attendance'}
+            </Button>
           </div>
         </div>
 
-        {/* 4 Summary Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            title="Total Assigned Students"
-            value="125"
-            subtitle="Across 2 lecture sections"
-            icon={Users}
-            badge="Enrolled"
-          />
-          <MetricCard
-            title="Lectures Delivered"
-            value="44 / 50"
-            subtitle="88% course syllabus covered"
-            change="+2 this week"
-            trend="up"
-            icon={Clock}
-          />
-          <MetricCard
-            title="Class Attendance Rate"
-            value="89.1%"
-            subtitle="Average student attendance"
-            icon={CalendarCheck}
-          />
-          <MetricCard
-            title="Course Resources"
-            value="14"
-            subtitle="Uploaded this semester"
-            icon={BookOpen}
-          />
+        {/* Action Priority Grid (Rule 35: Faculty UI should prioritize actions) */}
+        <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+              Immediate Teaching Actions Pending Today
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">3 items requiring review</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Action 1: Next Class Attendance */}
+            <div className="p-4 rounded-lg border border-slate-200/80 bg-slate-50/50 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <Badge variant="info" size="sm">Today · 11:00 AM</Badge>
+                  <span className="font-mono text-slate-500 text-[11px]">Room A-301</span>
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs pt-1">
+                  Operating Systems (CS602) • Section B
+                </h4>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Lecture 45 of 50: Virtual Memory Page Replacement Algorithms.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setMarkedToday(true)}
+                >
+                  {markedToday ? 'Attendance Logged (58/61)' : 'Launch Attendance Sheet'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Action 2: Submissions to Grade */}
+            <div className="p-4 rounded-lg border border-slate-200/80 bg-slate-50/50 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <Badge variant="warning" size="sm">24 Submissions</Badge>
+                  <span className="font-mono text-slate-500 text-[11px]">Due Today</span>
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs pt-1">
+                  Lab Exercise 6: Shell Scripting
+                </h4>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  24 students submitted practical solutions awaiting code evaluation.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60">
+                <Link href="/faculty/students" className="block">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Open Grading Rubric
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Action 3: At-Risk Attendance Alerts */}
+            <div className="p-4 rounded-lg border border-slate-200/80 bg-slate-50/50 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <Badge variant="danger" size="sm">3 Students at Risk</Badge>
+                  <span className="font-mono text-slate-500 text-[11px]">Margin &lt; 76%</span>
+                </div>
+                <h4 className="font-bold text-slate-900 text-xs pt-1">
+                  Attendance Regulatory Alerts
+                </h4>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  3 learners are 1 lecture away from exam debarment in CS602.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60">
+                <Link href="/faculty/classes" className="block">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Review At-Risk Roster
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Section 30: My Classes */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-900">Assigned Courses & Lecture Batches</h3>
+        {/* High-Signal Stat Row */}
+        <StatRow
+          stats={[
+            {
+              label: 'Total Assigned Students',
+              value: '125',
+              meta: 'Across 2 lecture batches (CSE 6A & 6B)',
+              badge: 'Enrolled',
+            },
+            {
+              label: 'Lectures Delivered',
+              value: '44 / 50',
+              change: '+2 this week',
+              trend: 'up',
+              meta: '88% syllabus covered',
+            },
+            {
+              label: 'Class Attendance Average',
+              value: '89.1%',
+              meta: 'Well above 75% regulatory cutoff',
+              badge: 'Healthy',
+            },
+            {
+              label: 'Course Bank Material',
+              value: '14 Files',
+              meta: 'Lecture slides & lab guides uploaded',
+            },
+          ]}
+        />
+
+        {/* Assigned Courses Cards */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+            Assigned Courses & Lecture Batches
+          </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Class 1 */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4 hover:border-indigo-300 transition-all">
+            <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    CS602 • Theory
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-1">Operating Systems</h4>
-                  <p className="text-xs text-slate-500">Section CSE 6B • Room A-301</p>
+                  <Badge variant="neutral" size="sm">CS602 • Core Theory</Badge>
+                  <h4 className="text-sm font-bold text-slate-900 mt-1">Operating Systems & Kernels</h4>
+                  <p className="text-xs text-slate-500">B.Tech CSE • Semester 6 • Section B (61 Students)</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-xl font-bold font-mono text-slate-900">61</span>
-                  <span className="text-[10px] text-slate-400 block font-mono">Students</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-slate-100 font-mono">
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Attendance</span>
-                  <span className="font-bold text-emerald-600">88.0%</span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Class GPA</span>
-                  <span className="font-bold text-slate-900">8.05</span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Lectures</span>
-                  <span className="font-bold text-indigo-600">44 / 50</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                <Link
-                  href="/faculty/classes"
-                  className="font-semibold text-indigo-600 hover:text-indigo-800"
-                >
-                  Manage Class Roster →
+                <Link href="/faculty/classes">
+                  <Button variant="outline" size="sm">View Class</Button>
                 </Link>
-                <button
-                  onClick={() => alert('Attendance marked for CS602 (Operating Systems)')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold"
-                >
-                  Mark Attendance
-                </button>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>Coverage: 44/50 Lectures</span>
+                <span className="font-mono font-semibold text-emerald-600">89.4% Attendance</span>
               </div>
             </div>
 
-            {/* Class 2 */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4 hover:border-indigo-300 transition-all">
+            <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                    CS601 • Theory
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-1">Database Management Systems</h4>
-                  <p className="text-xs text-slate-500">Section CSE 6A • Room B-204</p>
+                  <Badge variant="neutral" size="sm">CS604L • Laboratory</Badge>
+                  <h4 className="text-sm font-bold text-slate-900 mt-1">Web Technology Laboratory</h4>
+                  <p className="text-xs text-slate-500">B.Tech CSE • Semester 6 • Section A (64 Students)</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-xl font-bold font-mono text-slate-900">64</span>
-                  <span className="text-[10px] text-slate-400 block font-mono">Students</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-slate-100 font-mono">
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Attendance</span>
-                  <span className="font-bold text-emerald-600">92.0%</span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Class GPA</span>
-                  <span className="font-bold text-slate-900">8.22</span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-50">
-                  <span className="text-[10px] text-slate-400 block font-sans">Lectures</span>
-                  <span className="font-bold text-indigo-600">46 / 50</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                <Link
-                  href="/faculty/classes"
-                  className="font-semibold text-indigo-600 hover:text-indigo-800"
-                >
-                  Manage Class Roster →
+                <Link href="/faculty/classes">
+                  <Button variant="outline" size="sm">View Lab</Button>
                 </Link>
-                <button
-                  onClick={() => alert('Attendance marked for CS601 (Database Systems)')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold"
-                >
-                  Mark Attendance
-                </button>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>Coverage: 22/24 Lab Sessions</span>
+                <span className="font-mono font-semibold text-emerald-600">92.1% Attendance</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Quick Actions Bar (Section 30: mark attendance, upload resource, enter marks, create assignment, send notice) */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
-          <h3 className="text-sm font-bold text-slate-900">Faculty Quick Actions</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
-            <button
-              onClick={() => alert('Modal: Mark Classroom Attendance')}
-              className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 text-slate-800 font-semibold flex flex-col items-center text-center space-y-1.5 transition-colors"
-            >
-              <CalendarCheck className="w-5 h-5 text-indigo-600" />
-              <span>Mark Attendance</span>
-            </button>
-            <button
-              onClick={() => alert('Modal: Upload Resource to ARC Bank')}
-              className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 text-slate-800 font-semibold flex flex-col items-center text-center space-y-1.5 transition-colors"
-            >
-              <Upload className="w-5 h-5 text-blue-600" />
-              <span>Upload Resource</span>
-            </button>
-            <button
-              onClick={() => alert('Modal: Enter Mid-Term Internal Marks')}
-              className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 text-slate-800 font-semibold flex flex-col items-center text-center space-y-1.5 transition-colors"
-            >
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Enter Marks</span>
-            </button>
-            <button
-              onClick={() => alert('Modal: Create New Lab Assignment')}
-              className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 text-slate-800 font-semibold flex flex-col items-center text-center space-y-1.5 transition-colors"
-            >
-              <Plus className="w-5 h-5 text-amber-600" />
-              <span>Create Assignment</span>
-            </button>
-            <button
-              onClick={() => alert('Modal: Dispatch Notice to Class Section')}
-              className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 text-slate-800 font-semibold flex flex-col items-center text-center space-y-1.5 transition-colors"
-            >
-              <Bell className="w-5 h-5 text-purple-600" />
-              <span>Send Notice</span>
-            </button>
           </div>
         </div>
       </div>

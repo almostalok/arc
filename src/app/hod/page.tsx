@@ -1,10 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { AppShell } from '../../components/layout/AppShell';
-import { MetricCard } from '../../components/ui/MetricCard';
+import { StatRow } from '../../components/ui/StatRow';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { StudentDrawer } from '../../components/student/StudentDrawer';
 import { mockStudents } from '../../data/mockData';
+import { Student } from '../../types';
 import { 
   Layers, 
   Users, 
@@ -12,15 +16,15 @@ import {
   CalendarCheck, 
   TrendingUp, 
   AlertTriangle, 
-  ArrowRight,
-  CheckCircle2,
+  ArrowRight, 
   Award,
-  Clock
+  ChevronRight,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function HodDashboardPage() {
+  const [inspectedStudent, setInspectedStudent] = useState<Student | null>(null);
   const cseStudents = mockStudents.filter((s) => s.departmentCode === 'CSE');
-  const atRiskStudents = mockStudents.filter((s) => s.status === 'At Risk' || s.attendancePercentage < 80);
 
   return (
     <AppShell>
@@ -29,198 +33,215 @@ export default function HodDashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-5">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
-                Department Directorate • CSE Division
+              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+                Department Directorate • Computer Science & Engineering
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-200">
-                Dr. Ramesh Chandra (HOD)
+              <span className="text-[11px] font-medium text-slate-500">
+                • Dr. Ramesh Chandra (Professor & HOD)
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Computer Science & Engineering Command
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+              Department Governance & Academic Exceptions
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Curricular tracking, faculty allocation, student at-risk interventions, and placement outcomes.
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Curricular delivery tracking, faculty teaching workload, student at-risk exceptions, and placement benchmarks.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Link
-              href="/hod/students"
-              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-2xs"
-            >
-              <span>Student Roster & At-Risk</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+          <div className="flex items-center space-x-2.5">
+            <Link href="/hod/students">
+              <Button variant="primary" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                Student Roster & At-Risk Roster
+              </Button>
             </Link>
           </div>
         </div>
 
-        {/* 4 Core Department Metrics from Section 29 */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            title="CSE Headcount"
-            value="824"
-            subtitle="Across 4 batches"
-            icon={Users}
-            badge="Enrolled"
-          />
-          <MetricCard
-            title="Department Average GPA"
-            value="8.12"
-            subtitle="Highest among engineering depts"
-            change="+0.14"
-            trend="up"
-            icon={GraduationCap}
-          />
-          <MetricCard
-            title="Aggregate Attendance"
-            value="88.2%"
-            subtitle="Classroom & Lab sessions"
-            icon={CalendarCheck}
-          />
-          <MetricCard
-            title="Placement Conversion"
-            value="91.4%"
-            subtitle="Google, Microsoft, Razorpay"
-            change="+4.2%"
-            trend="up"
-            icon={TrendingUp}
-          />
-        </div>
+        {/* High-Signal Stat Row (Rule 36) */}
+        <StatRow
+          stats={[
+            {
+              label: 'CSE Headcount',
+              value: '824',
+              meta: 'Across 4 undergraduate batches',
+              badge: 'Department Total',
+            },
+            {
+              label: 'Mean Department GPA',
+              value: '8.12',
+              change: '+0.14',
+              trend: 'up',
+              meta: 'Highest across institution',
+              badge: 'Rank #1',
+            },
+            {
+              label: 'Aggregate Attendance',
+              value: '88.2%',
+              meta: 'Classroom & practical sessions',
+              badge: 'Healthy',
+            },
+            {
+              label: 'Placement Conversion',
+              value: '91.4%',
+              change: '+4.2%',
+              trend: 'up',
+              meta: 'Google, Microsoft, Razorpay, Juspay',
+              badge: 'Day-0 / Day-1',
+            },
+          ]}
+        />
 
-        {/* 2-Column: Top Performers & At-Risk Roster */}
+        {/* 2-Column: Top Performers & At-Risk Interventions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Students */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+          <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Award className="w-4 h-4 text-amber-500" />
-                <h3 className="text-sm font-bold text-slate-900">Top Technical Students (CSE)</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                  Top Technical Performers (CSE)
+                </h3>
               </div>
               <Link href="/pulse" className="text-xs text-indigo-600 font-semibold hover:underline">
-                Explore in ARC Pulse →
+                ARC Pulse →
               </Link>
             </div>
 
             <div className="divide-y divide-slate-100">
               {cseStudents.slice(0, 4).map((s) => (
-                <div key={s.id} className="py-2.5 flex items-center justify-between text-xs">
+                <div
+                  key={s.id}
+                  onClick={() => setInspectedStudent(s)}
+                  className="py-3 flex items-center justify-between text-xs hover:bg-slate-50/70 px-2 rounded-md cursor-pointer transition-colors"
+                >
                   <div className="flex items-center space-x-3">
-                    <img src={s.avatar} alt={s.name} className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200" />
+                    <img
+                      src={s.avatar}
+                      alt={s.name}
+                      className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-200"
+                    />
                     <div>
-                      <div className="font-bold text-slate-900">{s.name}</div>
-                      <div className="text-[11px] text-slate-400 font-mono">
+                      <div className="font-semibold text-slate-900">{s.name}</div>
+                      <div className="text-[11px] text-slate-500 font-mono">
                         {s.arcId} • LeetCode {s.evidence.codingRating}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-mono font-bold text-indigo-700">CGPA {s.cgpa}</div>
-                    <div className="text-[10px] text-emerald-600 font-semibold">Readiness {s.careerReadinessScore}%</div>
+                    <div className="font-mono font-bold text-slate-900 tabular-nums">CGPA {s.cgpa}</div>
+                    <span className="text-[10px] text-emerald-600 font-medium">Readiness {s.careerReadinessScore}%</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* At-Risk Students & Attendance Alerts */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+          {/* At-Risk Remedial Interventions (Rule 36: Emphasize exceptions) */}
+          <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-rose-600">
-                <AlertTriangle className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-slate-900">Immediate Remedial Intervention Alerts</h3>
+                <ShieldAlert className="w-4 h-4" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                  Remedial Intervention Alerts
+                </h3>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">
-                Requires Notice
-              </span>
+              <Badge variant="danger" size="sm" dot>
+                Immediate Action Required
+              </Badge>
             </div>
 
             <div className="space-y-2.5">
-              <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200 text-xs space-y-1">
-                <div className="flex justify-between font-bold text-amber-950">
-                  <span>Rohan Verma (ME • Arc #1145)</span>
-                  <span className="font-mono text-rose-600">Attendance: 73.8%</span>
+              <div className="p-3.5 rounded-lg border border-amber-200/90 bg-amber-50/60 text-xs space-y-1">
+                <div className="flex justify-between font-semibold text-amber-950">
+                  <span>Rohan Verma (Roll #2301042018)</span>
+                  <span className="font-mono text-rose-600 font-bold">Attendance: 73.8%</span>
                 </div>
-                <p className="text-[11px] text-amber-800">
-                  Below 75% cutoff in 2 theory subjects. Parent consultation alert dispatched.
+                <p className="text-[11px] text-amber-900 leading-snug">
+                  Below 75% regulatory cutoff in Operating Systems & AI. Mandatory mentorship notice generated for parent consultation.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200 text-xs space-y-1">
-                <div className="flex justify-between font-bold text-amber-950">
-                  <span>Vikram Aditya (CSE • Arc #1077)</span>
-                  <span className="font-mono text-rose-600">CGPA: 7.10</span>
+              <div className="p-3.5 rounded-lg border border-amber-200/90 bg-amber-50/60 text-xs space-y-1">
+                <div className="flex justify-between font-semibold text-amber-950">
+                  <span>Vikram Aditya (Roll #2301042022)</span>
+                  <span className="font-mono text-amber-700 font-bold">CGPA: 7.10</span>
                 </div>
-                <p className="text-[11px] text-amber-800">
-                  Approaching minimum criteria for upcoming Microsoft and Razorpay drives. Assigned faculty mentor: Prof. Shalini Mishra.
+                <p className="text-[11px] text-amber-900 leading-snug">
+                  Approaching minimum GPA threshold for upcoming Tier-1 campus drives. Assigned academic mentor: Prof. Shalini Mishra.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200 text-xs flex items-center justify-between">
+              <div className="p-3.5 rounded-lg border border-slate-200/80 bg-slate-50/80 text-xs flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-indigo-950">CS605 (Artificial Intelligence) Class Average Alert</div>
-                  <p className="text-[11px] text-indigo-700 mt-0.5">Section A average dropped 4.2% following Midterm Unit 3.</p>
+                  <div className="font-semibold text-slate-900">CS605 (AI) Section A Midterm Outlier</div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Section mean fell 4.2% following Unit 3 examination.</p>
                 </div>
-                <button
-                  onClick={() => alert('Dispatched tutorial revision schedule to CSE Section A')}
-                  className="px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[11px] shrink-0 ml-2"
-                >
-                  Schedule Review
-                </button>
+                <Button variant="outline" size="sm">
+                  Schedule Tutorial
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Faculty Load & Course Performance Matrix */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900">Faculty Workload & Course Evaluation Status</h3>
-            <span className="text-xs text-slate-400 font-mono">Odd Sem 2024–25</span>
+        {/* Faculty Workload Matrix (Rule 36) */}
+        <div className="rounded-xl bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+              Department Faculty Workload & Syllabus Completion Status
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">Odd Semester 2026</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                 <tr>
-                  <th className="p-3">Faculty Member</th>
-                  <th className="p-3">Assigned Course</th>
-                  <th className="p-3">Section</th>
-                  <th className="p-3">Student Load</th>
-                  <th className="p-3">Syllabus Completion</th>
-                  <th className="p-3">Attendance Marked</th>
+                  <th className="px-4 py-3">Faculty Member</th>
+                  <th className="px-4 py-3">Assigned Course</th>
+                  <th className="px-3 py-3">Batch / Section</th>
+                  <th className="px-3 py-3">Student Load</th>
+                  <th className="px-3 py-3">Syllabus Coverage</th>
+                  <th className="px-4 py-3 text-right">Lectures Delivered</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                <tr className="hover:bg-slate-50">
-                  <td className="p-3 font-bold text-slate-900">Dr. Ramesh Chandra (HOD)</td>
-                  <td className="p-3 text-slate-700">Database Management Systems (CS601)</td>
-                  <td className="p-3 font-mono font-semibold">CSE 6A</td>
-                  <td className="p-3 font-mono">64</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">88%</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">46 / 50 Lectures</td>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tr className="hover:bg-slate-50/70 transition-colors">
+                  <td className="px-4 py-3 font-semibold text-slate-900">Dr. Ramesh Chandra (HOD)</td>
+                  <td className="px-4 py-3 text-slate-700">Database Management Systems (CS601)</td>
+                  <td className="px-3 py-3 font-mono">CSE 6A</td>
+                  <td className="px-3 py-3 font-mono tabular-nums">64</td>
+                  <td className="px-3 py-3 font-mono text-emerald-600 font-bold tabular-nums">88%</td>
+                  <td className="px-4 py-3 font-mono text-right font-medium text-slate-900 tabular-nums">46 / 50</td>
                 </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="p-3 font-bold text-slate-900">Prof. Shalini Mishra</td>
-                  <td className="p-3 text-slate-700">Operating Systems (CS602)</td>
-                  <td className="p-3 font-mono font-semibold">CSE 6B</td>
-                  <td className="p-3 font-mono">61</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">84%</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">44 / 50 Lectures</td>
+                <tr className="hover:bg-slate-50/70 transition-colors">
+                  <td className="px-4 py-3 font-semibold text-slate-900">Prof. Shalini Mishra</td>
+                  <td className="px-4 py-3 text-slate-700">Operating Systems & Kernels (CS602)</td>
+                  <td className="px-3 py-3 font-mono">CSE 6B</td>
+                  <td className="px-3 py-3 font-mono tabular-nums">61</td>
+                  <td className="px-3 py-3 font-mono text-emerald-600 font-bold tabular-nums">84%</td>
+                  <td className="px-4 py-3 font-mono text-right font-medium text-slate-900 tabular-nums">44 / 50</td>
                 </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="p-3 font-bold text-slate-900">Prof. Neha Gupta</td>
-                  <td className="p-3 text-slate-700">Web Technology Laboratory (CS604L)</td>
-                  <td className="p-3 font-mono font-semibold">CSE 6A + 6B</td>
-                  <td className="p-3 font-mono">125</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">92%</td>
-                  <td className="p-3 font-mono text-emerald-600 font-bold">29 / 31 Labs</td>
+                <tr className="hover:bg-slate-50/70 transition-colors">
+                  <td className="px-4 py-3 font-semibold text-slate-900">Prof. Neha Gupta</td>
+                  <td className="px-4 py-3 text-slate-700">Web Technology Laboratory (CS604L)</td>
+                  <td className="px-3 py-3 font-mono">CSE 6A + 6B</td>
+                  <td className="px-3 py-3 font-mono tabular-nums">125</td>
+                  <td className="px-3 py-3 font-mono text-emerald-600 font-bold tabular-nums">92%</td>
+                  <td className="px-4 py-3 font-mono text-right font-medium text-slate-900 tabular-nums">29 / 31</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      {/* Contextual Student Drawer */}
+      <StudentDrawer
+        student={inspectedStudent}
+        isOpen={!!inspectedStudent}
+        onClose={() => setInspectedStudent(null)}
+      />
     </AppShell>
   );
 }
