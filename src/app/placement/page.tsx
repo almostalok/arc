@@ -1,24 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { AppShell } from '../../components/layout/AppShell';
-import { MetricCard } from '../../components/ui/MetricCard';
+import { StatRow } from '../../components/ui/StatRow';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { StudentDrawer } from '../../components/student/StudentDrawer';
 import { PlacementPipelineKanban } from '../../components/placement/PlacementPipelineKanban';
+import { mockAllApplications, mockStudents } from '../../data/mockData';
+import { Student } from '../../types';
 import { 
   Briefcase, 
   Building, 
   Users, 
   CheckCircle2, 
   Award, 
-  TrendingUp, 
-  ArrowRight,
-  Filter,
-  BarChart3,
-  Calendar
+  BarChart3, 
+  Calendar,
+  Layers,
+  ArrowUpRight,
+  Filter
 } from 'lucide-react';
 
 export default function PlacementCommandPage() {
+  const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
+  const [inspectedStudent, setInspectedStudent] = useState<Student | null>(null);
+
+  const handleOpenStudent = (studentId: string) => {
+    const student = mockStudents.find((s) => s.id === studentId) || mockStudents[0];
+    setInspectedStudent(student);
+  };
+
   return (
     <AppShell>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -26,96 +39,205 @@ export default function PlacementCommandPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-5">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
                 ARC Placement • Recruitment Command Center
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-200">
-                Session 2024–25
-              </span>
+              <Badge variant="verified" size="sm" dot>
+                Drive Funnels Active
+              </Badge>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Manage Every Opportunity from Application to Offer
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
+              Campus Recruitment Pipelines & Offers
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              End-to-end recruitment funnel tracking across Tier 1, Dream, and Core engineering companies.
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              End-to-end recruitment funnel tracking across Super Dream, Dream, and Core engineering companies.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Link
-              href="/placement/companies"
-              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-2xs"
-            >
-              <Building className="w-3.5 h-3.5" />
-              <span>Company Directory</span>
+          <div className="flex items-center space-x-2.5">
+            <Link href="/placement/companies">
+              <Button variant="outline" size="sm" leftIcon={<Building className="w-3.5 h-3.5" />}>
+                Recruiter Directory
+              </Button>
             </Link>
-            <Link
-              href="/placement/analytics"
-              className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors"
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>CTC Analytics</span>
+            <Link href="/placement/analytics">
+              <Button variant="secondary" size="sm" leftIcon={<BarChart3 className="w-3.5 h-3.5" />}>
+                CTC & Placement Analytics
+              </Button>
             </Link>
           </div>
         </div>
 
-        {/* 5 Core Metrics from Section 21 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <MetricCard
-            title="Active Drives"
-            value="18"
-            subtitle="Tier 1 & Dream"
-            icon={Briefcase}
-          />
-          <MetricCard
-            title="Applications"
-            value="842"
-            subtitle="In active process"
-            icon={Users}
-          />
-          <MetricCard
-            title="Shortlisted"
-            value="421"
-            subtitle="Cleared screening"
-            icon={CheckCircle2}
-          />
-          <MetricCard
-            title="Interviews"
-            value="143"
-            subtitle="Technical & HR"
-            icon={Calendar}
-          />
-          <MetricCard
-            title="Offers Released"
-            value="38"
-            subtitle="Highest: ₹54 LPA"
-            change="+12 this week"
-            trend="up"
-            icon={Award}
-          />
+        {/* High-Signal Stat Row (Rule 12 & 30) */}
+        <StatRow
+          stats={[
+            {
+              label: 'Active Campus Drives',
+              value: '18 Drives',
+              meta: 'Super Dream & Tier 1 Recruiters',
+              badge: '2026 Cycle',
+            },
+            {
+              label: 'Total In-Process Candidates',
+              value: '842',
+              meta: 'In active review funnels',
+              badge: 'Campus Wide',
+            },
+            {
+              label: 'Shortlisted for Assessments',
+              value: '421',
+              meta: 'Cleared preliminary criteria',
+            },
+            {
+              label: 'Official Offers Released',
+              value: '38 Offers',
+              change: '+12 this week',
+              trend: 'up',
+              meta: 'Peak CTC: ₹54 LPA (Google)',
+              badge: 'Confirmed',
+            },
+          ]}
+        />
+
+        {/* View Switcher Controls (Rule 30: Pipelines + Tables) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Operational View:
+            </span>
+            <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs">
+              <button
+                onClick={() => setViewMode('kanban')}
+                className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                  viewMode === 'kanban'
+                    ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Pipeline Stages (Kanban)
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-slate-900 text-white font-semibold shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Candidate Roster (Table)
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Link href="/placement/drives">
+              <Button variant="outline" size="sm">
+                View All 18 Drives Matrix →
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Placement Pipeline Kanban (Section 22) */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Live Candidate Pipeline (Kanban)</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Drag or inspect candidate progress across recruitment evaluation milestones.
-              </p>
+        {/* Primary View Area */}
+        {viewMode === 'kanban' ? (
+          <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                  Multi-Stage Candidate Funnel
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Applied → Shortlisted → Assessment → Technical Round → HR Round → Offer
+                </p>
+              </div>
+              <span className="text-xs font-mono text-slate-500">Live Funnel</span>
             </div>
-
-            <div className="flex items-center space-x-2 text-xs">
-              <span className="font-semibold text-slate-500">Fast Filter:</span>
-              <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono font-semibold">
-                Google, Microsoft, Razorpay, Deloitte
+            <PlacementPipelineKanban />
+          </div>
+        ) : (
+          <div className="rounded-xl bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-slate-200/80 bg-slate-50/50 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                Placement Applications Roster
+              </h3>
+              <span className="text-xs font-mono text-slate-500">
+                {mockAllApplications.length} Candidates tracked
               </span>
             </div>
-          </div>
 
-          <PlacementPipelineKanban />
-        </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3">Candidate</th>
+                    <th className="px-3 py-3">ARC ID / Dept</th>
+                    <th className="px-3 py-3">Company</th>
+                    <th className="px-3 py-3">Role</th>
+                    <th className="px-3 py-3">Package</th>
+                    <th className="px-3 py-3">Stage</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  {mockAllApplications.map((app) => (
+                    <tr
+                      key={app.id}
+                      onClick={() => handleOpenStudent(app.studentId)}
+                      className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                    >
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {app.studentName}
+                      </td>
+                      <td className="px-3 py-3 font-mono text-slate-500">
+                        {app.studentArcId} • {app.studentDepartment}
+                      </td>
+                      <td className="px-3 py-3 font-medium text-slate-900">
+                        <Link
+                          href={`/placement/companies`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="hover:text-indigo-600 hover:underline"
+                        >
+                          {app.companyName}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 text-slate-600">{app.role}</td>
+                      <td className="px-3 py-3 font-mono font-bold text-slate-900 tabular-nums">
+                        ₹{app.packageLPA} LPA
+                      </td>
+                      <td className="px-3 py-3">
+                        <Badge
+                          variant={app.currentStage === 'Selected' ? 'success' : 'info'}
+                          size="sm"
+                          dot
+                        >
+                          {app.currentStage}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={`/placement/drives/${app.driveId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center space-x-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                        >
+                          <span>Drive Matrix</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Contextual Student Drawer */}
+      <StudentDrawer
+        student={inspectedStudent}
+        isOpen={!!inspectedStudent}
+        onClose={() => setInspectedStudent(null)}
+      />
     </AppShell>
   );
 }
