@@ -19,7 +19,18 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@arc/types": ["./packages/types/src/index.ts"],
+      "@arc/constants": ["./packages/constants/src/index.ts"],
+      "@arc/validation": ["./packages/validation/src/index.ts"],
+      "@arc/permissions": ["./packages/permissions/src/index.ts"],
+      "@arc/events": ["./packages/events/src/index.ts"],
+      "@arc/utils": ["./packages/utils/src/index.ts"],
+      "@arc/api-client": ["./packages/api-client/src/index.ts"],
+      "@arc/config": ["./packages/config/src/index.ts"],
+      "@arc/auth": ["./packages/auth/src/index.ts"],
+      "@arc/design-system": ["./packages/design-system/src/index.ts"],
+      "@arc/ui": ["./packages/ui/src/index.ts"]
     }
   },
   "include": [
