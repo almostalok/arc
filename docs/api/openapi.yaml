@@ -1,0 +1,81 @@
+openapi: 3.1.0
+info:
+  title: ARC Operating System REST API
+  description: Official API specification for the modern college operating system connecting Academics, Talent, and Placements.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Primary API Gateway
+paths:
+  /auth/me:
+    get:
+      summary: Retrieve current authenticated session identity
+      responses:
+        '200':
+          description: Session identity envelope
+  /students:
+    get:
+      summary: Query student graph directory with filtering and pagination
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated students list
+  /attendance:
+    get:
+      summary: Retrieve subject-wise attendance and missable classes metrics
+      responses:
+        '200':
+          description: Attendance metrics
+    post:
+      summary: Record new attendance session
+      responses:
+        '201':
+          description: Attendance session logged
+  /jobs:
+    get:
+      summary: List active placement drives
+      responses:
+        '200':
+          description: Active placement drives list
+    post:
+      summary: Create new placement drive
+      responses:
+        '201':
+          description: Placement drive created
+  /eligibility:
+    post:
+      summary: Evaluate student eligibility against job requirements
+      responses:
+        '200':
+          description: Explainable eligibility scorecard
+  /applications:
+    get:
+      summary: Query placement applications
+      responses:
+        '200':
+          description: Student applications list
+    post:
+      summary: Submit placement application
+      responses:
+        '201':
+          description: Application registered
+  /resumes/export:
+    get:
+      summary: Export official verified collegiate resume document
+      responses:
+        '200':
+          description: Plain text / PDF downloadable resume
+  /intelligence:
+    post:
+      summary: Query ARC explainable intelligence layer
+      responses:
+        '200':
+          description: Natural language answer and recommendations

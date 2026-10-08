@@ -1,121 +1,146 @@
 # ARC — The Operating System for Modern Colleges
 
-> **Academics. Talent. Careers. One connected ecosystem.**
+> **Academics. Talent. Careers. One Connected Ecosystem.**
 
-ARC is a modern, connected operating system for institutions of higher education. Unlike traditional, fragmented college ERPs, ARC connects students, faculty, department chairs, placement cells, university administration, and recruiters into a single **unified student identity graph**.
+ARC is a production-grade, multi-tenant college operating system connecting:
+1. **ARC Student / ERP** (Academic records, biometric attendance, degree credits, coursework, timetable)
+2. **ARC Pulse** (Evidence-backed talent intelligence, algorithmic competency radar, verified GitHub/LeetCode signals)
+3. **ARC Placement** (Corporate CRM, placement drives, rule-based eligibility engine, application funnel, interview scorecards)
+4. **ARC Intelligence** (Explainable cross-platform AI synthesis, skill gap auditing, contextual institutional assistance)
 
 ---
 
 ## 🏛️ System Architecture
 
-ARC is structured into four core interconnected product systems:
+ARC is engineered as a domain-driven monorepo utilizing **pnpm workspaces** and **Turborepo**:
 
 ```text
-                         ARC
-              COLLEGE OPERATING SYSTEM
-                         │
-        ┌────────────────┼────────────────┐
-        │                │                │
-        ▼                ▼                ▼
-   ARC STUDENT       ARC PULSE       ARC PLACEMENT
-   Student OS        Talent OS       Career OS
-        │                │                │
-        └────────────────┼────────────────┘
-                         │
-                         ▼
-                 ARC INTELLIGENCE
-                         │
-                         ▼
-                     ARC CORE
+ARC/
+├── apps/
+│   ├── web/            # Next.js 16 (App Router / React 19) Unified Collegiate Web Platform
+│   ├── api/            # Modular REST API Backend Service
+│   ├── recruiter/      # Scoped Corporate Recruiter Portal
+│   └── admin/          # Institution Administration Console
+│
+├── packages/
+│   ├── types/          # Normalized Domain Models & Standard RFC API Envelopes
+│   ├── constants/      # Regulatory Attendance Cutoffs, Tiers, Scoring Weights, Status Enums
+│   ├── validation/     # Centralized Zod Validation Schemas
+│   ├── permissions/    # Granular RBAC & ABAC Multi-Tenancy Policy Engine
+│   ├── events/         # Domain Events Contracts & Pub/Sub Event Bus
+│   ├── utils/          # Deterministic Eligibility, Attendance Risk & Talent Scoring Engines
+│   ├── api-client/     # Typed HTTP Client with Context & Error Parsing
+│   ├── config/         # Environment Variable Validation
+│   ├── auth/           # HttpOnly Session Security & Token Cryptography
+│   ├── design-system/  # Token Specs (Vercel Precision + Linear Density + Stripe Clarity)
+│   └── ui/             # Reusable UI Primitives (Badge, Button, Drawer, StatRow, EmptyState)
+│
+├── prisma/
+│   ├── schema.prisma   # Normalized 60+ Model PostgreSQL Schema
+│   └── seed.ts         # Multi-Tenant Institutional Database Seeder
+│
+├── infra/
+│   ├── docker/         # Production Dockerfiles (Web, API, BullMQ Worker)
+│   ├── terraform/      # AWS Cloud Infrastructure IaC (RDS, ElastiCache, S3, ECS)
+│   ├── monitoring/     # Prometheus Scrape Targets & Grafana Operational Dashboard
+│   └── scripts/        # Automated Database Migration, Backup & Seed Scripts
+│
+├── docs/
+│   ├── architecture/   # System, Database, Auth, Permissions & Event specs
+│   ├── product/        # Student, Faculty, Placement, Pulse & Recruiter specs
+│   ├── design-system/  # Token guidelines, accessibility (WCAG 2.2 AA)
+│   └── api/            # OpenAPI 3.1 Specification
+│
+├── docker-compose.yml  # Multi-Container Development Orchestration
+├── turbo.json          # Monorepo Pipeline Orchestration
+└── pnpm-workspace.yaml
 ```
 
-### 1. 🎓 ARC Student
-- **Unified Digital ID Profile**: Consolidates academic history, verified skills, GitHub projects, LeetCode ratings, internships, and certifications.
-- **Academic GPA Engine**: Multi-semester performance tracking, subject-wise credits, internal/external evaluations, and grade audits.
-- **Attendance Tracker**: Lecture-by-lecture presence logs with automated alerts when approaching the 75% regulatory eligibility threshold.
-- **Career Readiness Index**: Evidence-based competence scoring with targeted recommendations.
-- **Application Tracking**: Multi-stage pipeline from applied to offer.
+---
 
-### 2. ⚡ ARC Pulse
-- **Multi-Dimensional Talent Discovery**: Powerful filters across Department, Batch, CGPA, Coding score, Open Source contributions, and Hackathon wins.
-- **Evidence-Based Talent Radar**: 6-axis competence analysis (Academics, Coding, Development, Communication, Leadership, Career).
-- **Institutional Leaderboards**: Campus rankings across coding competitions, technical development, academics, and leadership.
-- **At-Risk Detection**: Early warning signals for students experiencing sudden attendance declines or eligibility deficits.
+## ⚡ Core Domain Subsystems
 
-### 3. 💼 ARC Placement
-- **Recruitment Command Center**: Live Kanban pipeline tracking candidates across Applied, Shortlisted, Online Assessment, Technical Round, HR Round, and Selected.
-- **Recruiter Directory**: Company profiles with hiring histories, average packages, and active drives (Google, Microsoft, Razorpay, Deloitte, Amazon, etc.).
-- **Job Drives Matrix**: Full round-by-round timelines, candidate funnels, and compensation breakdowns.
-- **CTC & Salary Analytics**: Multi-year compensation trends and department conversion benchmarks.
+### 1. 🎓 ARC Student OS
+- **Unified Institutional Identity**: Live synchronisation across Registrar marks, attendance registers, and recruiter submissions.
+- **Attendance Intelligence**: Computes current attendance percentage alongside exact *safe missable classes* before breaching the statutory 75% threshold.
+- **Academic Transcript & GPA**: Multi-semester SGPA/CGPA progression and credit audit.
+- **Official Resume Generation**: Instant export of verified collegiate resumes (`/api/v1/resumes/export`) directly from the student graph.
 
-### 4. 🧠 ARC Intelligence
-- **Cross-System AI Synthesis**: Natural language institutional queries like *"Which CSE students are best suited for software engineering roles?"* or *"Which students are at risk of missing placement eligibility?"*.
-- **Email Intelligence**: Prototype screen displaying AI-detected career updates from institutional mailboxes.
+### 2. ⚡ ARC Pulse — Talent Intelligence
+- **Evidence-Backed Talent Radar**: 6-axis competence analysis (Academics, Coding, Development, Experience, Communication, Certifications) weighted by verified artifacts.
+- **Code & Repository Signals**: Verified LeetCode ratings and GitHub repository activity evaluated without arbitrary black-box AI scores.
+- **Institutional Leaderboards**: Departmental talent rankings and peer benchmarks.
+
+### 3. 💼 ARC Placement Command Center
+- **Recruiter CRM**: Tiered directory of corporate hiring partners (Super Dream, Dream, Tier 1, Tier 2).
+- **Rule-Based Eligibility Engine**: Automatically evaluates CGPA, active backlogs, departmental eligibility, and attendance records with transparent pass/fail explanations.
+- **Multi-Stage Kanban Pipeline**: Tracks candidates from `Applied` → `Shortlisted` → `Online Assessment` → `Technical Round` → `HR Round` → `Selected` → `Placed`.
+- **Interview Scorecards**: Multi-metric evaluation (Technical, Communication, Problem Solving, Culture Fit, Recommendation).
+
+### 4. 🧠 ARC Intelligence Layer
+- **Explainable Opportunity Matching**: Breaks down why a student matches a role and identifies specific skill gaps to bridge.
+- **Cross-Platform Natural Language Assistant**: Real-time querying across collegiate student records, attendance anomalies, and placement funnels.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Recharts, Lucide Icons |
+| **Backend & APIs** | Next.js Route Handlers (`/api/v1/*`), Node.js, Express/NestJS modular architecture |
+| **Database & Cache**| PostgreSQL 16, Prisma ORM, Redis 7 (BullMQ async queues) |
+| **Storage & Infra** | MinIO / AWS S3 (Signed Artifact URLs), Docker Compose, Terraform |
+| **Observability** | Structured JSON logging, Prometheus metrics, Grafana dashboards |
+| **Security & Auth** | RBAC + ABAC Policy Engine, HttpOnly Session Cookies, Zod validation |
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js `v20+` or `v22+`
-- npm `10+`
+### 1. Prerequisites
+- Node.js `v22+`
+- npm `10+` or pnpm `10+`
+- Docker & Docker Compose (optional for local database container)
 
-### Installation
+### 2. Local Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/almostalok/arc.git
 cd arc
 
-# Install dependencies
+# Install monorepo dependencies
 npm install
 
-# Start development server
+# Start local PostgreSQL, Redis, and MinIO via Docker Compose (optional)
+docker compose up -d postgres redis minio
+
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [http://localhost:3000](http://localhost:3000) to view ARC.
 
 ---
 
-## 🧭 The 3–5 Minute Guided Demo Flow
+## 🧪 Testing & Verification
 
-The prototype comes with a floating **Interactive Demo Walkthrough Bar** at the bottom of the screen.
+```bash
+# Type safety check
+npx tsc --noEmit
 
-| Step | Persona | Feature | Direct Route |
-| :--- | :--- | :--- | :--- |
-| **01** | Public | **Platform Overview & Core Systems** | [`/`](http://localhost:3000/) |
-| **02** | Any | **Instant Multi-Role Login** | [`/login`](http://localhost:3000/login) |
-| **03** | Student | **Student Command Center** | [`/student`](http://localhost:3000/student) |
-| **04** | Student | **Verified Digital ID Profile** | [`/student/profile`](http://localhost:3000/student/profile) |
-| **05** | Student / HOD | **ARC Pulse — Talent Discovery** | [`/pulse`](http://localhost:3000/pulse) |
-| **06** | Student / Recruiter | **Student Talent Intelligence Profile** | [`/pulse/students/s-1042`](http://localhost:3000/pulse/students/s-1042) |
-| **07** | Placement Cell | **Live Kanban Placement Pipeline** | [`/placement`](http://localhost:3000/placement) |
-| **08** | Placement Cell | **Recruiter Drive (Google SDE 2026)** | [`/placement/drives/drive-google-2026`](http://localhost:3000/placement/drives/drive-google-2026) |
-| **09** | Student | **Multi-Stage Application Tracker** | [`/student/placements`](http://localhost:3000/student/placements) |
-| **10** | Director | **Director Executive Command Center** | [`/director`](http://localhost:3000/director) |
-| **11** | All | **ARC Intelligence Assistant** | Press `✨ ARC AI` in Topbar or `⌘J` |
+# Production build verification
+npm run build
+
+# Run linting
+npm run lint
+```
 
 ---
 
-## ⌨️ Keyboard Shortcuts & Productivity
+## 🛡️ Security & Tenant Isolation
 
-- **`⌘K` / `Ctrl+K`**: Global Command Palette & Unified Entity Search
-- **`⌘J` / `Ctrl+J`**: Launch ARC Institutional Intelligence AI Assistant
-- **`ESC`**: Dismiss open modal or drawer
-
----
-
-## 🎨 Design System
-
-Complete design and architecture documentation is available in the [`/design`](./design/) directory:
-- [`design/design.md`](./design/design.md): Master product design system specification (155 sections)
-- [`design/tokens.md`](./design/tokens.md): Semantic color tokens, typography scales, spacing units, and radius specs
-
----
-
-## 🔒 Security & Privacy Architecture
-
-- **Tenant Isolation**: Institution-level data boundary ensuring zero cross-tenant leakage.
-- **RBAC & ABAC**: Attribute-based scoped access (`self`, `section`, `subject`, `department`, `institution`).
-- **Cryptographic Audit Ledger**: Immutable activity logging for regulatory compliance and administrative accountability.
+- **Tenant Boundary Enforcement**: Every entity is scoped by `institutionId`, checked both at the route handler and authorization policy layers.
+- **Zero LocalStorage Tokens**: Authentication sessions are stored in cryptographically verified, HttpOnly, secure cookies.
+- **Audit Logging**: Every sensitive action (`MARK_UPDATED`, `ATTENDANCE_RECORDED`, `APPLICATION_STAGE_CHANGED`, `OFFER_RELEASED`) is recorded with actor ID, timestamp, and IP address.
