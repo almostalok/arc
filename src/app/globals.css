@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --color-arc-50: #eef2ff;
+  --color-arc-100: #e0e7ff;
+  --color-arc-500: #6366f1;
+  --color-arc-600: #4f46e5;
+  --color-arc-700: #4338ca;
+  --color-arc-900: #312e81;
+}
+
 @layer base {
   :root {
     --bg-page: #f8fafc;
     --text-primary: #0f172a;
-    --text-muted: #64748b;
+    --text-muted: #475569;
     --border-color: #e2e8f0;
+    --border-strong: #cbd5e1;
     --arc-indigo: #4f46e5;
+    --arc-indigo-hover: #4338ca;
     --arc-blue: #3b82f6;
+  }
+
+  * {
+    border-color: var(--border-color);
   }
 
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
+    font-family: var(--font-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* Tabular figures for data tables, metrics, IDs, roll numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom Scrollbars */
@@ -38,12 +61,7 @@
   background: #94a3b8;
 }
 
-/* Tabular figures for data tables and metrics */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Subtle badge pulse */
+/* Subtle micro-indicator animations */
 @keyframes subtle-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(1.02); }
@@ -51,4 +69,20 @@
 
 .animate-subtle-pulse {
   animation: subtle-pulse 3s infinite ease-in-out;
+}
+
+/* Focus styles for keyboard accessibility */
+:focus-visible {
+  outline: 2px solid var(--arc-indigo);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
