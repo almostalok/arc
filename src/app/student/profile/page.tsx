@@ -6,6 +6,7 @@ import { AppShell } from '../../../components/layout/AppShell';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { mockStudents } from '../../../data/mockData';
+import { calculateProfileCompleteness } from '@arc/utils';
 import { 
   ShieldCheck, 
   GraduationCap, 
@@ -24,12 +25,14 @@ import {
   Share2,
   FileText,
   Building,
-  Check
+  Check,
+  Download
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '../../../components/ui/BrandIcons';
 
 export default function StudentProfilePage() {
   const student = mockStudents[0]; // Alok Kumar Singh
+  const completeness = calculateProfileCompleteness(student);
   const [activeTab, setActiveTab] = useState<'overview' | 'academics' | 'skills' | 'projects' | 'placement'>('overview');
 
   const tabs = [
@@ -113,6 +116,15 @@ export default function StudentProfilePage() {
                   <span>LeetCode ✓ Knight</span>
                   <ExternalLink className="w-3 h-3 text-slate-400" />
                 </a>
+
+                <a
+                  href={`/api/v1/resumes/export?studentId=${student.id}`}
+                  download
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-xs transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5 text-white" />
+                  <span>Download Verified Resume</span>
+                </a>
               </div>
 
               <div className="flex items-center space-x-2 text-[11px] text-slate-400">
@@ -176,6 +188,25 @@ export default function StudentProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Explainable Profile Completeness Indicator (Section 43) */}
+        {completeness.missingItems.length > 0 && (
+          <div className="p-4 rounded-xl bg-indigo-50/80 border border-indigo-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-indigo-950">
+                  Institutional Profile Completeness: {completeness.percentage}%
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-200/60 text-indigo-800 font-mono font-semibold">
+                  {100 - completeness.percentage}% remaining to 100% verified graph
+                </span>
+              </div>
+              <p className="text-indigo-800 text-[11px] leading-relaxed">
+                Actionable Next Steps: {completeness.missingItems.map((m) => m.label).join(' • ')}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Profile Navigation Tabs */}
         <div className="border-b border-slate-200/80 flex space-x-6 overflow-x-auto text-xs font-semibold">

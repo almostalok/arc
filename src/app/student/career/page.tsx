@@ -4,18 +4,20 @@ import React from 'react';
 import { AppShell } from '../../../components/layout/AppShell';
 import { mockStudents } from '../../../data/mockData';
 import { TalentRadar } from '../../../components/pulse/TalentRadar';
+import { calculateTalentScore } from '@arc/utils';
 import { Zap, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp, Award } from 'lucide-react';
 
 export default function StudentCareerPage() {
   const student = mockStudents[0];
+  const talentMetrics = calculateTalentScore(student);
 
   const categories = [
-    { name: 'Academics & CGPA', score: student.scores.academics, benchmark: 80, status: 'Exceeds' },
-    { name: 'Technical & Coding', score: student.scores.coding, benchmark: 85, status: 'Top 2%' },
-    { name: 'Development & Projects', score: student.scores.development, benchmark: 80, status: 'Top 5%' },
-    { name: 'Communication & Soft Skills', score: student.scores.communication, benchmark: 75, status: 'Meets' },
-    { name: 'Leadership & Events', score: student.scores.leadership, benchmark: 70, status: 'Exceeds' },
-    { name: 'Overall Placement Readiness', score: student.careerReadinessScore, benchmark: 75, status: 'Super Dream Ready' },
+    { name: 'Academics & CGPA', score: talentMetrics.scores.academics, benchmark: 80, status: 'Exceeds' },
+    { name: 'Technical & Coding', score: talentMetrics.scores.coding, benchmark: 85, status: 'Top 2%' },
+    { name: 'Development & Projects', score: talentMetrics.scores.development, benchmark: 80, status: 'Top 5%' },
+    { name: 'Communication & Soft Skills', score: talentMetrics.scores.communication, benchmark: 75, status: 'Meets' },
+    { name: 'Leadership & Experience', score: talentMetrics.scores.experience, benchmark: 70, status: 'Exceeds' },
+    { name: 'Overall Placement Readiness', score: talentMetrics.overallScore, benchmark: 75, status: 'Super Dream Ready' },
   ];
 
   return (

@@ -14,9 +14,12 @@ export interface Student {
   currentSemester: number;
   section: string;
   cgpa: number;
+  backlogs?: number;
   attendancePercentage: number;
   creditsEarned: number;
   creditsTotal: number;
+  institutionId?: string;
+  graduationYear?: number;
   status: 'Active' | 'At Risk' | 'Interning' | 'Placed';
   careerReadinessScore: number;
   scores: {

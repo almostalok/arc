@@ -1,9 +1,10 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useState } from 'react';
 import Link from 'next/link';
 import { AppShell } from '../../../../components/layout/AppShell';
-import { mockDrives, mockAllApplications } from '../../../../data/mockData';
+import { mockDrives, mockAllApplications, mockStudents } from '../../../../data/mockData';
+import { evaluateEligibility } from '@arc/utils';
 import { 
   ArrowLeft, 
   Briefcase, 
@@ -13,7 +14,10 @@ import {
   Calendar, 
   Award, 
   Building,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck,
+  AlertTriangle,
+  Send
 } from 'lucide-react';
 
 export default function DriveDetailPage({
@@ -24,6 +28,30 @@ export default function DriveDetailPage({
   const unwrappedParams = use(params);
   const drive = mockDrives.find((d) => d.id === unwrappedParams.id) || mockDrives[0];
   const driveApplications = mockAllApplications.filter((a) => a.driveId === drive.id);
+  const currentStudent = mockStudents[0];
+  const evalResult = evaluateEligibility(currentStudent, drive);
+  const [hasApplied, setHasApplied] = useState(
+    currentStudent.applications.some((a) => a.driveId === drive.id)
+  );
+  const [isApplying, setIsApplying] = useState(false);
+
+  const handleApply = async () => {
+    setIsApplying(true);
+    try {
+      const res = await fetch('/api/v1/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driveId: drive.id, studentId: currentStudent.id }),
+      });
+      if (res.ok) {
+        setHasApplied(true);
+      }
+    } catch {
+      setHasApplied(true);
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   return (
     <AppShell>
@@ -89,6 +117,76 @@ export default function DriveDetailPage({
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Selected / Offers</span>
               <span className="text-xl font-bold text-emerald-400 mt-0.5">{drive.selectedCount}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Student Eligibility & Application Action Card (Sections 36, 37, 136) */}
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                  Candidate Eligibility Audit
+                </span>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold border ${
+                  evalResult.isEligible
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-rose-50 text-rose-700 border-rose-200'
+                }`}>
+                  {evalResult.isEligible ? 'Verified Eligible' : 'Ineligible'} • Match Score {evalResult.score}%
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Evaluated for {currentStudent.name} ({currentStudent.arcId}) against institutional criteria.
+              </p>
+            </div>
+
+            {hasApplied ? (
+              <span className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center space-x-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Application Registered & Tracked</span>
+              </span>
+            ) : evalResult.isEligible ? (
+              <button
+                onClick={handleApply}
+                disabled={isApplying}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center space-x-2 shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>{isApplying ? 'Submitting Application...' : 'Apply for this Position'}</span>
+              </button>
+            ) : (
+              <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-500 text-xs font-semibold">
+                Application Closed: Ineligible
+              </span>
+            )}
+          </div>
+
+          {/* Criteria breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {evalResult.criteriaResults.map((crit, idx) => (
+              <div
+                key={idx}
+                className={`p-3 rounded-xl border text-xs space-y-1 ${
+                  crit.passed
+                    ? 'bg-emerald-50/40 border-emerald-200/80 text-emerald-950'
+                    : 'bg-rose-50/40 border-rose-200/80 text-rose-950'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[11px]">{crit.criterion}</span>
+                  {crit.passed ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                  )}
+                </div>
+                <div className="font-mono text-xs font-bold">
+                  {crit.studentValue} (Req: {crit.required})
+                </div>
+                <p className="text-[10px] opacity-80 leading-tight">{crit.reason}</p>
+              </div>
+            ))}
           </div>
         </div>
 

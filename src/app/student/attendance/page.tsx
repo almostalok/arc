@@ -5,6 +5,7 @@ import { AppShell } from '../../../components/layout/AppShell';
 import { StatRow } from '../../../components/ui/StatRow';
 import { Badge } from '../../../components/ui/Badge';
 import { mockStudents } from '../../../data/mockData';
+import { calculateAttendanceMetrics } from '@arc/utils';
 import { 
   CalendarCheck, 
   AlertTriangle, 
@@ -108,8 +109,9 @@ export default function StudentAttendancePage() {
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {student.attendanceBySubject.map((sub) => {
-                  const isSafe = sub.percentage >= 85;
-                  const isWarning = sub.percentage >= 75 && sub.percentage < 85;
+                  const metrics = calculateAttendanceMetrics(sub.attended, sub.total);
+                  const isSafe = metrics.status === 'Safe';
+                  const isWarning = metrics.status === 'Warning';
 
                   return (
                     <tr key={sub.subjectCode} className="hover:bg-slate-50/70 transition-colors">
@@ -144,11 +146,21 @@ export default function StudentAttendancePage() {
                           size="sm"
                           dot
                         >
-                          {sub.status}
+                          {metrics.status === 'Safe' ? 'Safe Status' : metrics.status === 'Warning' ? 'Caution' : 'Critical'}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-[11px] text-slate-500">
-                        {isWarning ? 'Can miss max 2 classes' : 'Safe margin (+5 classes)'}
+                      <td className="px-4 py-3 text-right font-mono text-[11px] text-slate-600">
+                        {metrics.classesCanMiss > 0 ? (
+                          <span className="text-emerald-700 font-semibold">
+                            Can safely miss {metrics.classesCanMiss} class{metrics.classesCanMiss > 1 ? 'es' : ''}
+                          </span>
+                        ) : metrics.classesNeededToRecover > 0 ? (
+                          <span className="text-rose-600 font-bold">
+                            Attend {metrics.classesNeededToRecover} class{metrics.classesNeededToRecover > 1 ? 'es' : ''} to recover
+                          </span>
+                        ) : (
+                          <span className="text-amber-700 font-medium">At 75% limit (cannot miss)</span>
+                        )}
                       </td>
                     </tr>
                   );

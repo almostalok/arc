@@ -20,6 +20,11 @@ export function ArcIntelligenceModal() {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('q1');
   const [customInput, setCustomInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customResult, setCustomResult] = useState<{
+    answer: string;
+    evidence: string[];
+    recommendations: string[];
+  } | null>(null);
 
   useEffect(() => {
     if (aiDefaultQuery) {
@@ -42,6 +47,7 @@ export function ArcIntelligenceModal() {
   const currentPreset = mockAiPresetQueries.find((q) => q.id === selectedPresetId) || mockAiPresetQueries[0];
 
   const handleSelectPreset = (id: string) => {
+    setCustomResult(null);
     setIsProcessing(true);
     setSelectedPresetId(id);
     setTimeout(() => {
@@ -49,13 +55,25 @@ export function ArcIntelligenceModal() {
     }, 250);
   };
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
+  const handleCustomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customInput.trim()) return;
     setIsProcessing(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/v1/intelligence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: customInput, studentId: 's-1042' }),
+      });
+      const json = await res.json();
+      if (json.data) {
+        setCustomResult(json.data);
+      }
+    } catch {
+      // fallback
+    } finally {
       setIsProcessing(false);
-    }, 400);
+    }
   };
 
   return (
@@ -120,6 +138,51 @@ export function ArcIntelligenceModal() {
               <div className="text-xs text-slate-500 font-medium">
                 Analyzing 8,421 student graphs across academic & coding indices...
               </div>
+            </div>
+          ) : customResult ? (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-2">
+                <div className="flex items-center space-x-2 text-indigo-800 text-xs font-bold">
+                  <Bot className="w-4 h-4 text-indigo-600" />
+                  <span>Institutional Intelligence Analysis</span>
+                </div>
+                <p className="text-xs text-slate-800 leading-relaxed font-medium">
+                  {customResult.answer}
+                </p>
+              </div>
+
+              {customResult.evidence.length > 0 && (
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-2">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Verified Evidence Trails
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-slate-700">
+                    {customResult.evidence.map((ev, idx) => (
+                      <li key={idx} className="flex items-center space-x-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                        <span>{ev}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {customResult.recommendations.length > 0 && (
+                <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-2">
+                  <div className="text-xs font-bold text-amber-900 flex items-center space-x-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Actionable Recommendations:</span>
+                  </div>
+                  <ul className="space-y-1 text-xs text-amber-800">
+                    {customResult.recommendations.map((rec, idx) => (
+                      <li key={idx} className="flex items-start space-x-1.5">
+                        <span className="font-bold">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ) : (
             <div>
